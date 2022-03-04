@@ -27,6 +27,7 @@ import org.dash.wallet.common.services.analytics.FirebaseAnalyticsServiceImpl
 import org.slf4j.LoggerFactory
 import android.app.Activity
 import de.schildbach.wallet.ui.ExchangeRatesFragment.*
+import de.schildbach.wallet.ui.about.AboutActivity
 import org.dash.wallet.common.data.ExchangeRate
 
 

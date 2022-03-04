@@ -26,12 +26,14 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.dash.wallet.common.data.SingleLiveEvent
 import org.dash.wallet.features.exploredash.data.ExploreDataSource
+import org.dash.wallet.features.exploredash.data.MerchantAtmDataSource
 import org.dash.wallet.features.exploredash.data.model.*
 import org.dash.wallet.features.exploredash.data.model.GeoBounds
 import org.dash.wallet.features.exploredash.services.UserLocation
 import org.dash.wallet.features.exploredash.services.UserLocationStateInt
 import org.dash.wallet.features.exploredash.ui.extensions.Const
 import org.dash.wallet.features.exploredash.ui.extensions.isMetric
+import org.slf4j.LoggerFactory
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.max
@@ -71,6 +73,8 @@ class ExploreViewModel @Inject constructor(
     private val locationProvider: UserLocationStateInt
 ) : ViewModel() {
     companion object {
+        private val log = LoggerFactory.getLogger(ExploreViewModel::class.java)
+
         const val QUERY_DEBOUNCE_VALUE = 300L
         const val PAGE_SIZE = 100
         const val MAX_ITEMS_IN_MEMORY = 300
@@ -291,6 +295,7 @@ class ExploreViewModel @Inject constructor(
                             val userLng = _currentUserLocation.value?.longitude
                             it.distance = calculateDistance(it, userLat, userLng)
                         }
+                        log.info("got ${list.count()} physical search results")
                         _physicalSearchResults.postValue(list)
                     }
                     .launchIn(viewModelWorkerScope)
@@ -313,15 +318,9 @@ class ExploreViewModel @Inject constructor(
         _selectedTerritory
             .onEach { territory ->
                 when {
-                    territory.isNotEmpty() -> {
-                        _searchLocationName.postValue(territory)
-                    }
-                    lastResolvedAddress != null -> {
-                        resolveAddress(lastResolvedAddress!!)
-                    }
-                    else -> {
-                        _searchLocationName.postValue("")
-                    }
+                    territory.isNotEmpty() -> _searchLocationName.postValue(territory)
+                    lastResolvedAddress != null -> resolveAddress(lastResolvedAddress!!)
+                    else -> _searchLocationName.postValue("")
                 }
             }
             .launchIn(viewModelWorkerScope)
@@ -572,6 +571,7 @@ class ExploreViewModel @Inject constructor(
                         selectedTerritory.value!!, radiusBounds ?: GeoBounds.noBounds
                 )
             }
+            log.info("counted $result paging search results")
             _pagingSearchResultsCount.postValue(result)
         }
     }

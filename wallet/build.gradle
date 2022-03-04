@@ -176,7 +176,7 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode project.hasProperty('versionCode') ? project.property('versionCode') as int : 70471
+        versionCode project.hasProperty('versionCode') ? project.property('versionCode') as int : 70472
         versionName project.hasProperty('versionName') ? project.property('versionName') : "7.4.7"
         multiDexEnabled true
         generatedDensities = ['hdpi', 'xhdpi']

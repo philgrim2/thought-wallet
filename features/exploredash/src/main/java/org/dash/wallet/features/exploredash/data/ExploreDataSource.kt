@@ -20,6 +20,8 @@ package org.dash.wallet.features.exploredash.data
 import androidx.paging.PagingSource
 import kotlinx.coroutines.flow.Flow
 import org.dash.wallet.features.exploredash.data.model.*
+import org.dash.wallet.features.exploredash.repository.GCExploreDatabase
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 interface ExploreDataSource {
@@ -92,7 +94,6 @@ open class MerchantAtmDataSource @Inject constructor(
     private val merchantDao: MerchantDao,
     private val atmDao: AtmDao
 ): ExploreDataSource {
-
     override fun observePhysicalMerchants(
         query: String,
         territory: String,

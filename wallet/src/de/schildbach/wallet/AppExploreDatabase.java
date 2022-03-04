@@ -1,5 +1,7 @@
 package de.schildbach.wallet;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -18,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 
 import dagger.hilt.EntryPoint;
 import dagger.hilt.InstallIn;
@@ -84,9 +87,19 @@ public abstract class AppExploreDatabase extends RoomDatabase {
                     });
         }
 
-        AppExploreDatabase database = dbBuilder.fallbackToDestructiveMigration().build();
+        AppExploreDatabase database = dbBuilder
+                .fallbackToDestructiveMigration()
+                .setQueryCallback((sqlQuery, bindArgs) -> {
+                    if (bindArgs.size() > 0) {
+                        log.info("executing query: " + sqlQuery);
+                        log.info("with bind args: " + bindArgs);
+                    }
+                }, Executors.newSingleThreadExecutor())
+                .build();
+
         if (!dbFile.exists()) {
             // execute simple query to trigger database opening (onOpenPrepackagedDatabase)
+            log.info("executing query for database opening");
             database.query("SELECT * FROM sqlite_master", null);
         }
         return database;
